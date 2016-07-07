@@ -1,28 +1,32 @@
 package by.training.task15.main;
 
-import by.training.task15.controller.ThreadController;
-import by.training.task15.domain.Matrix;
+import by.training.task15.constant.Constant;
+import by.training.task15.service.MatrixGenerator;
 
 public class Main {
 
 	public static void main(String[] args) throws InterruptedException {
-		int[][] x1 = { { 1, 2, 3, 4, 5 }, { 6, 7, 8, 9, 10 }, { 11, 12, 13, 14, 15 }, { 16, 17, 18, 19, 20 },
-				{ 21, 22, 23, 24, 25 } };
-		int[][] x2 = { { 26, 27, 28, 29, 30 }, { 31, 32, 33, 34, 35 }, { 36, 37, 38, 39, 40 }, { 41, 42, 43, 44, 45 },
-				{ 46, 47, 48, 49, 50 } };
-		ThreadController controller = new ThreadController();
-		controller.setMatrixes(x1, x2);
-		controller.setNumberOfThreads(2);
-		Matrix result = controller.count();
-		if (result != null) {
-			int[][] c = result.getMas();
-			for (int[] i : c) {
-				for (int r : i) {
-					System.out.print(r + " ");
+
+		final int[][] firstMatrix = new int[Constant.FIRST_MATRIX_ROWS][Constant.FIRST_MATRIX_COLS];
+		final int[][] secondMatrix = new int[Constant.SECOND_MATRIX_ROWS][Constant.SECOND_MATRIX_COLS];
+
+		MatrixGenerator.randomMatrix(firstMatrix);
+		MatrixGenerator.randomMatrix(secondMatrix);
+
+		final int[][] resultMatrixMT = MatrixGenerator.multiplyMatrixMT(firstMatrix, secondMatrix,
+				Runtime.getRuntime().availableProcessors());
+
+		final int[][] resultMatrix = MatrixGenerator.multiplyMatrix(firstMatrix, secondMatrix);
+
+		for (int row = 0; row < Constant.FIRST_MATRIX_ROWS; ++row) {
+			for (int col = 0; col < Constant.SECOND_MATRIX_COLS; ++col) {
+				if (resultMatrixMT[row][col] != resultMatrix[row][col]) {
+					System.out.println("Error in multithreaded calculation!");
+					return;
 				}
-				System.out.println("");
 			}
 		}
-	}
 
+		MatrixGenerator.printAllMatrix(Constant.PATH, firstMatrix, secondMatrix, resultMatrixMT);
+	}
 }
